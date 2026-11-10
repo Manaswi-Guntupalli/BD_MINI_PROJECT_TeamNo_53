@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Atlas — Distributed Search</title><link rel="stylesheet" href="/static/app.css"/></head>
+<body><div class="shell">
+<header><a class="brand" href="/"><span class="mark">✳</span> ATLAS<span class="brand-sub">/ Search Infrastructure</span></a>
+<div class="status" id="status">● Checking index</div></header>
+<main><div class="eyebrow">FOUR-NODE DISTRIBUTED SEARCH ENGINE <span>•</span> SPARK / ICEBERG / KAFKA</div>
+<h1>Find the signal<br/><span>in the information.</span></h1>
+<p class="lead">A ranked knowledge search engine built on distributed indexing, PageRank and BM25.</p>
+<form id="search-form" role="search"><span class="search-icon">⌕</span><input id="query" aria-label="Search documents" placeholder="Search the document collection…" autocomplete="off" required maxlength="256"/><button type="submit">Search <span>↗</span></button></form>
+<div class="examples">Try <button class="example" data-query="science">science</button><button class="example" data-query="history">history</button><button class="example" data-query="geography">geography</button></div>
+<div class="results-head"><h2 id="results-title">Search results</h2><span id="meta">Enter a query to begin</span></div>
+<section id="results" aria-live="polite"><div class="empty">The current search index is ready when an export is deployed.</div></section></main>
+<footer><span>ATLAS SEARCH</span><span>BM25 70% · PAGERANK 30%</span><span id="version">Index —</span></footer>
+</div><script src="/static/app.js"></script></body></html>

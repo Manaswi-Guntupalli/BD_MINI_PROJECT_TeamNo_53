@@ -1,0 +1,7 @@
+# Source for reference; set actual Java/Hadoop/Spark paths for your own VM.
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+export HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+export SPARK_MASTER_HOST=NODE3_ZEROTIER_IP
+export SPARK_LOCAL_IP=THIS_NODE_ZEROTIER_IP
+export SPARK_WORKER_MEMORY=3g
+export SPARK_WORKER_CORES=2

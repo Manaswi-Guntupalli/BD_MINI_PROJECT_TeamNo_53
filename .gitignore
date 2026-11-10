@@ -1,0 +1,16 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*.zip
+!fixtures/*.zip
+*.log
+.DS_Store
+.idea/
+.vscode/
+checkpoints/
+serving/
+*.parquet
+/data/official/
+/data/expected_results.json

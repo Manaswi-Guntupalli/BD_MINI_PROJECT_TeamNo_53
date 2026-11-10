@@ -1,0 +1,17 @@
+# Single-node KRaft for the optional classroom enhancement (NOT broker fault tolerant).
+# Replace NODE1_ZEROTIER_IP before using. Restrict the ports to ZeroTier peers.
+process.roles=broker,controller
+node.id=1
+controller.quorum.voters=1@127.0.0.1:9093
+listeners=PLAINTEXT://0.0.0.0:9092,CONTROLLER://127.0.0.1:9093
+advertised.listeners=PLAINTEXT://NODE1_ZEROTIER_IP:9092
+inter.broker.listener.name=PLAINTEXT
+controller.listener.names=CONTROLLER
+listener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+log.dirs=/home/USER/kafka-logs
+num.partitions=2
+default.replication.factor=1
+offsets.topic.replication.factor=1
+transaction.state.log.replication.factor=1
+transaction.state.log.min.isr=1
+auto.create.topics.enable=false

@@ -1,0 +1,2 @@
+# Node 1 producer only; PySpark is supplied by the standalone Spark install.
+kafka-python>=2.0.2,<3

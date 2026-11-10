@@ -1,0 +1,4 @@
+# Node 4 only (no Spark daemon on search node)
+fastapi>=0.110,<1
+uvicorn>=0.29,<1
+pyarrow>=16,<22

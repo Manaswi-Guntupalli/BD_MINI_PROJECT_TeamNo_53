@@ -1,0 +1,5 @@
+{"doc_id":"a","version":1,"title":"Solar System","text":"The Solar System contains the Sun and planets. Earth orbits the Sun.","url":"https://example.test/a","out_links":["b","https://example.test/c","not-a-document"]}
+{"doc_id":"b","version":1,"title":"Earth","text":"Earth is a planet in the Solar System with liquid water.","url":"https://example.test/b","out_links":["a","c"]}
+{"doc_id":"c","version":1,"title":"Astronomy","text":"Astronomy studies stars and planets in the night sky.","url":"https://example.test/c","out_links":["a"]}
+{"doc_id":"a","version":0,"title":"OLD Solar System","text":"This old duplicate should lose to the highest version.","out_links":[]}
+{"bad_record":true}

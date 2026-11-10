@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <property><name>dfs.replication</name><value>2</value></property>
+  <!-- On Node 2: NameNode + DataNode. On Node 3: DataNode only. -->
+  <property><name>dfs.namenode.name.dir</name><value>file:///home/USER/hadoop-data/namenode</value></property>
+  <property><name>dfs.datanode.data.dir</name><value>file:///home/USER/hadoop-data/datanode</value></property>
+  <property><name>dfs.permissions.enabled</name><value>true</value></property>
+</configuration>
