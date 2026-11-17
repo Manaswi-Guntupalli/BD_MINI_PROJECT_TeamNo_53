@@ -12,5 +12,9 @@ __pycache__/
 checkpoints/
 serving/
 *.parquet
-/data/official/
+# Track the two official course datasets when explicitly committed.
+# Keep other generated/temporary files in this directory ignored.
+/data/official/*
+!/data/official/pages.jsonl
+!/data/official/changes.json
 /data/expected_results.json
