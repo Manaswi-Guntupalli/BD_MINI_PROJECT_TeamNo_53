@@ -8,6 +8,13 @@ PHASE="$1"; INPUT="$2"
 [ -f "$INPUT" ] || { echo "Missing local file: $INPUT" >&2; exit 1; }
 export SPARK_DRIVER_HOST="${NODE1_HOST:?Set NODE1_HOST}"
 : "${HDFS_URI:?Source .env on this node}"
+# Prevent an incorrectly configured HDFS client from uploading to localhost.
+ACTUAL_HDFS="$(hdfs getconf -confKey fs.defaultFS)"
+if [[ "$ACTUAL_HDFS" != "$HDFS_URI" ]]; then
+  echo "HDFS client is targeting $ACTUAL_HDFS, but .env specifies $HDFS_URI" >&2
+  echo "Fix core-site.xml / HADOOP_CONF_DIR before ingestion; do not use localhost." >&2
+  exit 1
+fi
 NAME="$(basename "$INPUT")"
 hdfs dfs -mkdir -p /search/input
 hdfs dfs -put -f "$INPUT" "/search/input/$NAME"

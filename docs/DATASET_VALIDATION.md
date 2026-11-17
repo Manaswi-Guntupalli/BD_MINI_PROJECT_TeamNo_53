@@ -47,17 +47,17 @@ PYTHONPATH=. python scripts/verify_official_dataset.py \
 bash scripts/run_phase_node1.sh 0 data/official/pages.jsonl
 # Node 3: inspect actual Iceberg contents before indexing
 bash scripts/verify_phase_node3.sh 0
-bash scripts/run_index_node3.sh v1
+bash scripts/run_index_node3.sh v0
 # Node 4: deploy and inspect Phase 0 search results
-bash scripts/deploy_from_node3.sh v1
+bash scripts/deploy_from_node3.sh v0
 
 # Node 1: mandatory Phase 1
 bash scripts/run_phase_node1.sh 1 data/official/changes.json
 # Node 3: inspect actual Iceberg contents before indexing
 bash scripts/verify_phase_node3.sh 1
-bash scripts/run_index_node3.sh v2
-# Node 4: deploy and compare to v1
-bash scripts/deploy_from_node3.sh v2
+bash scripts/run_index_node3.sh v1
+# Node 4: deploy and compare to v0
+bash scripts/deploy_from_node3.sh v1
 ```
 
 `verify_phase_node3.sh` checks the real Spark/Iceberg tables and exits non-zero unless the expected phase-specific live, tombstone, row and link counts are correct, with no duplicate IDs or orphan links. This still needs to be executed on the actual four VMs.

@@ -5,9 +5,9 @@
 ## 1. Baseline Phase 0 / Phase 1
 
 1. Ingest official Phase 0; record `pages.count`, valid edges, PageRank score sum, number of inverted-index postings.
-2. Deploy `v1`; run queries in `/api/search`. Record doc IDs and BM25/PageRank scores.
-3. Apply Phase 1; deploy `v2`. Compare changed documents / deleted documents / results.
-4. Keep v1 deployment available. Run `scripts/rollback_node4.sh v1`, query again, then switch back to v2.
+2. Deploy `v0`; run queries in `/api/search`. Record doc IDs and BM25/PageRank scores.
+3. Apply Phase 1; deploy `v1`. Compare changed documents / deleted documents / results.
+4. Keep v0 deployment available. Run `scripts/rollback_node4.sh v0`, query again, then switch back to v1.
 5. Re-ingest Phase 1; verify zero changes and the `pages` snapshot ID unchanged.
 
 ## 2. HDFS replication factor 2
@@ -60,8 +60,8 @@ After intentionally rolling back `pages`, rebuild `links`, then index/export/dep
 
 | Experiment | Expected | Actual result | Proof files/screenshots |
 |---|---|---|---|
-| Baseline / Phase 0 | v1 valid and queryable | TODO | TODO |
-| Phase 1 changes | v2 reflects updates | TODO | TODO |
+| Baseline / Phase 0 | v0 valid and queryable | TODO | TODO |
+| Phase 1 changes | v1 reflects updates | TODO | TODO |
 | HDFS replication | 2 DataNodes, RF=2 | TODO | TODO |
 | Spark worker restart | Job retries/completes or explains failure | TODO | TODO |
 | Aborted export | Last-good version remains active | TODO | TODO |

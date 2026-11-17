@@ -34,6 +34,20 @@ Ensure Spark executors on VMs 2 and 3 use a Python 3.10 interpreter at the indic
 
 The official TA example selects `committed_at` from `pages.history`, but Iceberg `.history` has `made_current_at`. The `committed_at` column exists in `.snapshots`. Use the corrected SQL below.
 
+
+### IMPORTANT VM address correction (must fix before any serving demo)
+
+- VM1: `192.168.196.151` (confirmed on ZeroTier)
+- VM2: `192.168.196.156` (reported; verify on VM2)
+- VM3: `192.168.196.7` (reported; verify on VM3)
+- VM4: **`192.168.196.255` is invalid for your previously shown `/24` subnet** — it is the broadcast address. VM4 must read its real address using `sudo zerotier-cli listnetworks` and `ip -4 addr` and replace `NODE4_HOST` in `.env` on every VM.
+
+Run `bash scripts/ta_preflight_node1.sh` on VM1 before submitting the first job. It checks the subnet/broadcast problem and local inputs without formatting/altering the cluster.
+
+For the Node4 export hand-off, VM4 should set `NODE3_SSH_TARGET=USER_ON_VM3@192.168.196.7` if the VM3 Linux username differs from the one on VM4. This avoids SSH defaulting to VM4's local username.
+
+The script `scripts/submit.sh` now pins Spark's Python interpreter to Python 3.10 for the driver and remote executors, and includes the Kafka connector only for the optional streaming ingestion job. This reduces failure modes during the mandatory demonstration.
+
 ## 1. Mandatory Phase 0: deploy `v0`
 
 VM1:

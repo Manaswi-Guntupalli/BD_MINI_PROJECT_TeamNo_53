@@ -240,6 +240,8 @@ CALL lake.system.rollback_to_snapshot('search.pages', 1234567890123456789);
 
 After rolling back the `pages` table, rebuild sanitized links with `scripts/submit.sh jobs/rebuild_links.py` on Node 3, rerun indexing/export to a **new version** and deploy that export. For a fast user-visible rollback to an existing known-good Parquet release, run `scripts/rollback_node4.sh v0` **on Node 4** — this does not roll back Iceberg; it changes serving version only. Do not confuse the two rollback types.
 
+**Preflight before Phase 0 (VM1):** `bash scripts/ta_preflight_node1.sh`. It validates both uploaded official files, Spark dependency coordinates, and ZeroTier host addresses. **VM4's previously reported `192.168.196.255` is the broadcast address of the shown `/24` ZeroTier subnet and must be replaced with its true host IP.** `scripts/submit.sh` now defaults to Python 3.10 for Spark 3.3.4, and excludes the optional Kafka connector from mandatory batch jobs. For VM4 remote export copies, configure `NODE3_SSH_TARGET=USERNAME_ON_VM3@192.168.196.7` when SSH usernames differ.
+
 ## Repository layout
 
 ```text
