@@ -1,17 +1,38 @@
-# Official dataset files (bundled locally, not automatically published)
+# Official Project 1 datasets
 
-The user provided two original project datasets, now included in the **downloadable archive**:
+The official files used by this repository are:
 
-- `official/pages.jsonl` (Phase 0, 9.4 MB): **1,040** lines with **20 malformed JSON** lines; 1,020 valid records and 20 repeated documents → **1,000** distinct documents
-- `official/changes.json` (Phase 1, 406 KB): **100** newline-delimited JSON events despite the `.json` filename; 50 DELETE and 50 UPSERT; upserts consist of 25 existing-document updates and 25 new documents
+- `official/pages.jsonl` — Phase 0 input; 1,040 lines, including 20 intentionally malformed lines. The ingestion job expects 1,000 distinct active pages after validation and deduplication.
+- `official/changes.json` — Phase 1 input; 100 newline-delimited JSON events (50 DELETE, 50 UPSERT). Despite the `.json` extension, this is **JSON Lines**, not a single JSON array.
 
-These files are ignored by Git by default to avoid automatically publishing a course-provided dataset and third-party Wikipedia article content to a public repository. The files are **present** when you extract the downloadable ZIP/TAR.GZ. Copy the same files to Node 1 for running phases. If your course explicitly allows redistribution, you can choose to track them in Git deliberately (`git add -f data/official/...`).
+The repository is configured to track these exact two file paths. The files were supplied separately and **still need to be committed from a computer with the original dataset files** (for example VM1). Do not claim they are published until both show up on the GitHub main branch.
 
-The `expected_results.json` file is also generated locally and gitignored. Run:
+On VM1, after updating the repository:
 
 ```bash
-PYTHONPATH=. python scripts/verify_official_dataset.py \
+cd ~/BD_MINI_PROJECT_TeamNo_53
+git pull --ff-only origin main
+ls -lh data/official/pages.jsonl data/official/changes.json
+git add data/official/pages.jsonl data/official/changes.json
+git diff --cached --stat
+git commit -m "Add official Project 1 Phase 0 and Phase 1 datasets"
+git push origin main
+```
+
+Before committing, confirm the course allows redistribution of these datasets in the repository, especially if public. Never commit `.env`, credentials, logs, or generated `data/expected_results.json`.
+
+Check data inputs locally:
+
+```bash
+PYTHONPATH=. python3 scripts/check_input.py data/official/pages.jsonl --phase 0
+PYTHONPATH=. python3 scripts/check_input.py data/official/changes.json --phase 1
+```
+
+Generate a private reference summary:
+
+```bash
+PYTHONPATH=. python3 scripts/verify_official_dataset.py \
   data/official/pages.jsonl data/official/changes.json --output data/expected_results.json
 ```
 
-Do **not** use `json.load()` on the entire `changes.json` file; every non-empty line is its own JSON object.
+`data/expected_results.json` stays Git-ignored.
