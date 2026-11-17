@@ -1,4 +1,4 @@
-"""Shared Spark/Iceberg functions. Requires a configured Spark 3.5 cluster."""
+"""Shared Spark/Iceberg functions. Requires a configured compatible Spark cluster (team uses Spark 3.3.4)."""
 from __future__ import annotations
 
 import os

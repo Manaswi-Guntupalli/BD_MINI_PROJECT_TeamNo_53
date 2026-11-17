@@ -7,9 +7,9 @@ if [ "$#" -lt 1 ]; then echo 'usage: scripts/submit.sh jobs/ingest.py [args]' >&
 export ICEBERG_WAREHOUSE="${ICEBERG_WAREHOUSE:-${HDFS_URI}/search/warehouse}"
 export ICEBERG_CATALOG="${ICEBERG_CATALOG:-lake}"
 export ICEBERG_NAMESPACE="${ICEBERG_NAMESPACE:-search}"
-ICEBERG_RUNTIME="${ICEBERG_RUNTIME:-org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.6.1}"
-KAFKA_PACKAGE="${SPARK_KAFKA_PACKAGE:-org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1}"
-# Spark 3.5 / Scala 2.12 jars; ensure these align with installed Spark.
+ICEBERG_RUNTIME="${ICEBERG_RUNTIME:-org.apache.iceberg:iceberg-spark-runtime-3.3_2.12:1.6.1}"
+KAFKA_PACKAGE="${SPARK_KAFKA_PACKAGE:-org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.4}"
+# Spark 3.3.4 / Scala 2.12 jars; ensure these align with installed Spark.
 # Dependencies must also be reachable by Spark workers or downloaded to their caches.
 EXTRA_ARGS=()
 if [ -n "${SPARK_DRIVER_HOST:-}" ]; then

@@ -2,7 +2,7 @@
 # Run locally ONLY after creating an EMPTY GitHub repository in the browser.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-REMOTE="https://github.com/Manaswi-Guntupalli/distributed-search-engine-kafka.git"
+REMOTE="https://github.com/Manaswi-Guntupalli/BD_MINI_PROJECT_TeamNo_53.git"
 if ! git config user.name >/dev/null || ! git config user.email >/dev/null; then
   echo 'First configure YOUR git user.name and user.email (see docs/GITHUB_PUBLISH.md).' >&2
   exit 1

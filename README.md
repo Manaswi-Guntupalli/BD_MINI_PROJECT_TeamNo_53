@@ -35,6 +35,10 @@ flowchart TD
 
 **Node responsibilities exactly match the manual:** Node 1 is an HDFS client and Spark ingestion driver (no Spark/HDFS daemons). Node 2 runs the HDFS NameNode, HDFS DataNode and Spark worker. Node 3 runs the Spark master, Spark worker, another HDFS DataNode, and indexing/PageRank/export drivers. Node 4 runs only FastAPI/UI and serves locally copied Parquet. An optional single-node Kafka KRaft broker can share Node 1 for classroom use.
 
+## TA verification runbook (required demo readiness)
+
+Read **[docs/TA_DEMO_RUNBOOK.md](docs/TA_DEMO_RUNBOOK.md)** before the evaluation. It maps the TA's example SQL, URLs, and HDFS locations to this repository's actual names. Additional `/search` and `/health` aliases support the TA's HTTP checks. The additive `scripts/run_ta_export_node3.sh v0|v1` generates the TA's exact `/serving/vN/docs.parquet`, `index.parquet`, and `_READY` without changing Node 4's original safe release pipeline. **Do not claim the four-VM checklist is passed until you actually run and record it**; the bundled checks are offline only. The TA's claim that doc 146 must gain PageRank is not reproduced by the repo's 10-iteration algorithm on the supplied dataset (see runbook).
+
 ## Requirements cross-check
 
 | Course requirement | Implemented source | Verification |
@@ -55,7 +59,7 @@ flowchart TD
 
 ## Before setup: use the **official** guides
 
-All course-specific tool setup guides are linked in [docs/course_commands.md](docs/course_commands.md). In particular, use **Ubuntu 24.04, Java 11, Hadoop 3.3.6, your course's Spark 3.5-compatible build**, and the official ZeroTier setup. The sample course Hadoop guide configures a **single-node HDFS replication factor of 1**; for this project change to **2 DataNodes and replication 2** as the project manual requires. Never format a NameNode that already contains project data.
+All course-specific tool setup guides are linked in [docs/course_commands.md](docs/course_commands.md). In particular, use **Ubuntu 24.04, Java 11, Hadoop 3.3.6, your team's Spark 3.3.4 build**, and the official ZeroTier setup. The sample course Hadoop guide configures a **single-node HDFS replication factor of 1**; for this project change to **2 DataNodes and replication 2** as the project manual requires. Never format a NameNode that already contains project data.
 
 ### 0) Configure all VMs
 
@@ -96,7 +100,7 @@ curl "http://${NODE3_HOST}:8080/"  # Spark master UI should list 2 workers
 
 Use **passwordless SSH** (private key under your own user; no keys committed) between the VMs for Hadoop control and release transfer. For Spark client mode, workers must reach the ingestion driver on Node 1 over ZeroTier (see `spark.driver.host` in `scripts/submit.sh`). Permit required ports **only on your private ZeroTier network**: HDFS 9000, Spark master 7077, Spark worker/driver ports, Kafka 9092, and relevant UI/SSH ports. Spark UI defaults can vary; never expose HDFS/Kafka/Spark openly on the internet.
 
-**Check installed Spark/Scala versions** before first submit: `spark-submit --version`. The defaults in `.env.example` target Spark 3.5.x / Scala 2.12; change `ICEBERG_RUNTIME` and `SPARK_KAFKA_PACKAGE` to match the exact build. Spark 4 or different Scala binaries need other connector artifacts. Run `bash scripts/build_pyfiles.sh` automatically with the phase/index scripts to distribute the project's Python code to workers.
+**Check installed Spark/Scala versions** before first submit: `spark-submit --version`. The defaults in `.env.example` target Spark 3.3.4 / Scala 2.12; change `ICEBERG_RUNTIME` and `SPARK_KAFKA_PACKAGE` to match the exact build. Spark 4 or different Scala binaries need other connector artifacts. Run `bash scripts/build_pyfiles.sh` automatically with the phase/index scripts to distribute the project's Python code to workers.
 
 ### 1) Mandatory Phase 0 — Node 1 then Node 3 then Node 4
 
@@ -143,14 +147,15 @@ bash scripts/run_phase_node1.sh 0 data/official/pages.jsonl
 # Node 3 (separate terminal, after Phase 0 ingestion succeeds)
 set -a; source .env; set +a
 bash scripts/verify_phase_node3.sh 0  # should pass 1,000 live docs and 499 links
-bash scripts/run_index_node3.sh v1
+bash scripts/run_index_node3.sh v0
+bash scripts/run_ta_export_node3.sh v0  # exact /serving/v0/ files for TA checks
 
-# Node 4 (after the v1 export is ready)
+# Node 4 (after the v0 export is ready)
 set -a; source .env; set +a
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 # Ensure writable SERVING_ROOT, e.g. mkdir -p "$HOME/search-serving" and change .env
-bash scripts/deploy_from_node3.sh v1
+bash scripts/deploy_from_node3.sh v0
 SERVING_ROOT="$SERVING_ROOT" uvicorn search_engine.api:app --host 0.0.0.0 --port 8000
 
 # From your browser: http://NODE4_ZEROTIER_IP:8000
@@ -160,17 +165,18 @@ SERVING_ROOT="$SERVING_ROOT" uvicorn search_engine.api:app --host 0.0.0.0 --port
 
 **Important:** Choose a writable `SERVING_ROOT` on Node 4 (e.g. `$HOME/search-serving`) rather than `/srv/distributed-search` unless you explicitly provision permissions. All four nodes should use the same configuration values where applicable. Node 4's deployment script uses SSH to Node 3 to fetch the HDFS export into a local staging folder and pulls it across with `rsync`. `rsync` must be installed on Nodes 3 and 4.
 
-### 2) Mandatory Phase 1 — after seeing v1 search results
+### 2) Mandatory Phase 1 — after seeing v0 search results
 
 ```bash
 # Node 1
 bash scripts/run_phase_node1.sh 1 data/official/changes.json
 # Node 3
 bash scripts/verify_phase_node3.sh 1  # should pass 975 live docs and 467 links
-bash scripts/run_index_node3.sh v2
+bash scripts/run_index_node3.sh v1
+bash scripts/run_ta_export_node3.sh v1  # exact /serving/v1/ files for TA checks
 # Node 4
-bash scripts/deploy_from_node3.sh v2
-# API now reports v2, old v1 remains available for rollback.
+bash scripts/deploy_from_node3.sh v1
+# API now reports v1, old v0 remains available for rollback.
 ```
 
 Re-ingest Phase 0 or Phase 1 to verify no document changes or unnecessary `pages` snapshot were created (unchanged documents are intentionally skipped). Check the latest Iceberg snapshot ID and compare before/after. The links table is an atomic, derived sanitized edge table; the raw source links in `pages.raw_links` are deliberately preserved for re-resolution as new target pages appear.
@@ -219,7 +225,7 @@ python3 -m compileall -q jobs search_engine scripts
 PYTHONPATH=. python3 scripts/check_input.py fixtures/pages.jsonl
 ```
 
-Actual cluster verification **still required**: see [docs/failure_experiments.md](docs/failure_experiments.md) and [docs/verification_checklist.md](docs/verification_checklist.md). Minimum verification covers HDFS replication, both Spark workers, Iceberg idempotence/snapshots/time travel, PageRank mass conservation, BM25 result ordering, v1/v2 result differences, failed export retaining v1, replay, and Spark worker failure recovery. This source package has **not** run those tests remotely.
+Actual cluster verification **still required**: see [docs/failure_experiments.md](docs/failure_experiments.md) and [docs/verification_checklist.md](docs/verification_checklist.md). Minimum verification covers HDFS replication, both Spark workers, Iceberg idempotence/snapshots/time travel, PageRank mass conservation, BM25 result ordering, v0/v1 result differences, failed export retaining v0, replay, and Spark worker failure recovery. This source package has **not** run those tests remotely.
 
 ### 5) Rollback / snapshot history
 
@@ -232,7 +238,7 @@ SELECT * FROM lake.search.pages VERSION AS OF 1234567890123456789;
 CALL lake.system.rollback_to_snapshot('search.pages', 1234567890123456789);
 ```
 
-After rolling back the `pages` table, rebuild sanitized links with `scripts/submit.sh jobs/rebuild_links.py` on Node 3, rerun indexing/export to a **new version** and deploy that export. For a fast user-visible rollback to an existing known-good Parquet release, run `scripts/rollback_node4.sh v1` **on Node 4** — this does not roll back Iceberg; it changes serving version only. Do not confuse the two rollback types.
+After rolling back the `pages` table, rebuild sanitized links with `scripts/submit.sh jobs/rebuild_links.py` on Node 3, rerun indexing/export to a **new version** and deploy that export. For a fast user-visible rollback to an existing known-good Parquet release, run `scripts/rollback_node4.sh v0` **on Node 4** — this does not roll back Iceberg; it changes serving version only. Do not confuse the two rollback types.
 
 ## Repository layout
 

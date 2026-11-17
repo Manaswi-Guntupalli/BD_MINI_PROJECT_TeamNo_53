@@ -17,3 +17,17 @@ def test_api_search_and_frontend(monkeypatch):
     assert "ATLAS" in client.get("/").text
     assert client.get("/api/search", params={"q": ""}).status_code == 422
     assert client.get("/static/../../README.md").status_code in {404, 405}
+
+
+def test_ta_compatibility_routes(monkeypatch):
+    monkeypatch.setattr(index, "documents", {"a": {
+        "title": "Beard", "text": "Beard facial hair", "url": "https://example.test/a",
+        "version": 0, "pagerank": 1.0, "doc_len": 5}})
+    monkeypatch.setattr(index, "postings", {"beard": [("a", 2, 1)]})
+    monkeypatch.setattr(index, "avgdl", 5.0)
+    monkeypatch.setattr(index, "manifest", {"version": "v1"})
+    client = TestClient(app)
+    assert client.get("/health").json() == {"status": "ok", "version": 1}
+    response = client.get("/search", params={"q": "beard", "limit": 5})
+    assert response.status_code == 200
+    assert response.json()["results"][0]["doc_id"] == "a"
